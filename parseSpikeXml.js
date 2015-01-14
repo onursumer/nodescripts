@@ -3,8 +3,15 @@ var	xml2js = require('xml2js');
 var _ = require('underscore');
 var system = require('system');
 
+/**
+ * Parses the SpikeDB XML file (http://www.cs.tau.ac.il/~spike/)
+ *
+ * @param args  program arguments
+ */
 function main(args)
 {
+	// TODO get input and output file names from program arguments
+
 	var inputFile = "resource/LatestSpikeDB.xml";
 	var outputFile = "./spikeDB.txt";
 
@@ -21,6 +28,7 @@ function main(args)
 			var genes = result["SpikeDatabase"]["BuildingBlock"][0]["Gene"];
 			var id2Name = {};
 
+			// create a mapping to get gene names from gene references
 			_.each(genes, function(ele) {
 				var geneId = ele.$.id;
 				var geneName = ele.$.name;
@@ -28,6 +36,8 @@ function main(args)
 				id2Name[geneId] = geneName;
 			});
 
+			// for each regulation generate an output line with
+			// source gene name, target gene name, and regulation mechanism triplets
 			_.each(regulations, function(ele) {
 				var targetId = ele["Target"][0].$.ref;
 				var sourceId = ele["Source"][0].$.ref;
@@ -42,10 +52,9 @@ function main(args)
 					//console.log(line);
 					outputData.push(line);
 				}
-
-				//console.log(sourceId + "\t" + targetId);
 			});
 
+			// write the contents to the output file
 			fs.writeFile(outputFile, outputData.join("\n"));
 		});
 	});
